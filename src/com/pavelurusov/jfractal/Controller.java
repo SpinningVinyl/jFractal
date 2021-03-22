@@ -93,6 +93,7 @@ public class Controller {
     // event handler for the "Generate" button
     @FXML
     private void onGenButtonClicked () {
+        progressBar.setVisible(true);
         generate();
     } // end of onGenButtonClicked()
 
@@ -170,7 +171,10 @@ public class Controller {
         // bind the progress bar's progressProperty to the service's progress property
         progressBar.progressProperty().bind(myService.progressProperty());
         // if the service has succeeded, update the image view
-        myService.setOnSucceeded(e -> fractalView.setImage(wi));
+        myService.setOnSucceeded(e -> {
+            fractalView.setImage(wi);
+            progressBar.setVisible(false);
+        });
 
         // start the service
         myService.start();
