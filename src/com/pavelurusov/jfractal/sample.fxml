@@ -1,0 +1,72 @@
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<BorderPane fx:controller="com.pavelurusov.jfractal.Controller"
+            xmlns:fx="http://javafx.com/fxml" fx:id="root">
+    <center>
+        <ImageView fx:id="fractalView" fitWidth="800" fitHeight="800" smooth="true" />
+    </center>
+    <right>
+        <VBox spacing="10" style="-fx-padding: 8px" alignment="BASELINE_LEFT">
+            <fx:define>
+                <ToggleGroup fx:id="fractal" />
+            </fx:define>
+            <fx:define>
+                <ToggleGroup fx:id="c" />
+            </fx:define>
+            <HBox alignment="TOP_CENTER" spacing="5" style="-fx-padding: 30px 0 0 0">
+                <Button text="Generate" onMouseClicked="#onGenButtonClicked" />
+                <Button text="Save PNG" onMouseClicked="#onSaveButtonClicked" />
+            </HBox>
+            <ProgressBar fx:id="progressBar" maxWidth="Infinity" style="-fx-padding: 20px 0 0 0" />
+            <Label text="Set: " style="-fx-padding: 20px 0 0 0" />
+            <RadioButton fx:id="mandelbrotRB" text = "Mandelbrot" toggleGroup="$fractal" onAction="#selectSet" />
+            <RadioButton fx:id="juliaRB" text = "Julia" selected="true" onAction="#selectSet" toggleGroup="$fractal" />
+
+            <Label text="C (for Julia set): " style="-fx-padding: 30px 0 0 0" />
+            <RadioButton fx:id="c1RB" text = "c = 0.285 + 0.01i" selected="true" toggleGroup="$c" />
+            <RadioButton fx:id="c2RB" text = "c = –0.7269 + 0.1889i" toggleGroup="$c" />
+            <RadioButton fx:id="c3RB" text = "c = –0.8 + 0.156i" toggleGroup="$c" />
+            <RadioButton fx:id="c4RB" text = "c = –0.4 + 0.6i" toggleGroup="$c" />
+            <RadioButton fx:id="cCustomRB" text = "c = 0.7885e^(i*A)" toggleGroup="$c" />
+            <HBox spacing="15" style="-fx-padding: 15px 0 0 0"><Label text="A: " /><Label fx:id="aLabel" text="0" /></HBox>
+            <Slider fx:id="aSlider"
+                    max="2"
+                    min="0"
+                    majorTickUnit="0.5"
+                    minorTickCount="0"
+                    showTickMarks="true"
+                    showTickLabels="true"
+                    value="0"  />
+
+
+            <HBox spacing="15" style="-fx-padding: 30px 0 0 0"><Label text="Color offset: " /><Label fx:id="colorLabel" text="0" /></HBox>
+            <Slider fx:id="colorSlider"
+                    max="360"
+                    min="0"
+                    majorTickUnit="45"
+                    minorTickCount="15"
+                    showTickMarks="true"
+                    showTickLabels="true"
+                    value="1"  />
+
+            <HBox spacing="15" style="-fx-padding: 30px 0 0 0"><Label text="Zoom: " /><Label fx:id="zoomLabel" text="1.0" /></HBox>
+            <Slider fx:id="zoomSlider"
+                    max="4"
+                    min="1"
+                    majorTickUnit="0.5"
+                    minorTickCount="0"
+                    showTickMarks="true"
+                    showTickLabels="true"
+                    value="1"  />
+
+        </VBox>
+    </right>
+</BorderPane>
