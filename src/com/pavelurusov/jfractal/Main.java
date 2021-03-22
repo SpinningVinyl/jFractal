@@ -11,7 +11,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         // load FXML and set up the scene graph
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("jfractal.fxml"));
         primaryStage.setTitle("jFractal");
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
