@@ -2,7 +2,7 @@
 
 ![jFractal](jFractal.png)
 
-This is an implementation of an algorithm that generates Mandelbrot and Julia sets in Java.
+This is an implementation of an algorithm that generates visual representations of Mandelbrot and Julia sets in Java.
 
 Requires JavaFX and my own [Complex class](https://github.com/SpinningVinyl/java-complex-numbers).
 
