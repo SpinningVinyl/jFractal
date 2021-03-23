@@ -1,6 +1,8 @@
 package com.pavelurusov.jfractal;
 
-/* base abstract class for the Mandelbrot and Julia classes */
+/** @author Pavel Urusov, me@pavelurusov.com
+ *  base abstract class for the Mandelbrot and Julia classes
+ *  */
 
 public abstract class Fractal {
     public abstract double calculate(double x, double y);

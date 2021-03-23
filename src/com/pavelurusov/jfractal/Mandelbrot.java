@@ -10,14 +10,10 @@ public class Mandelbrot extends Fractal {
     private final int maxIterations;
     private final double MAX_X = 0.75, MAX_Y = 1.5, MIN_X = -2.25, MIN_Y = -1.5;
 
-
     public Mandelbrot(int maxIterations) {
         this.maxIterations = maxIterations;
     }
 
-    public int getMaxIterations() {
-        return maxIterations;
-    }
 
     public double calculate(double x, double y) {
         Complex z = new Complex(0,0);

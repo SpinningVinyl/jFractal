@@ -10,9 +10,8 @@ public class Julia extends Fractal {
 
     private Complex c;
 
+    private final int maxIterations;
     private final double MAX_X = 1.6, MAX_Y = 1.6, MIN_X = -1.6, MIN_Y = -1.6;
-
-    private int maxIterations;
 
     public Julia(int maxIterations, Complex c) {
         this.maxIterations = maxIterations;
