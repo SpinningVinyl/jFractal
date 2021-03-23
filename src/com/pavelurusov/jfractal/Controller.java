@@ -133,8 +133,6 @@ public class Controller {
     private void generate() {
         // create a new Writable Image
         WritableImage wi = new WritableImage(settings.IMG_WIDTH, settings.IMG_HEIGHT);
-        int maxCol = settings.IMG_WIDTH - 1;
-        int maxRow = settings.IMG_HEIGHT - 1;
 
         // declare a new Fractal object
         Fractal fractal;
