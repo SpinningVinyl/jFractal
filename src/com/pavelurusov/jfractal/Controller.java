@@ -3,19 +3,15 @@ package com.pavelurusov.jfractal;
 import com.pavelurusov.complex.Complex;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.FileChooser;
 
@@ -35,8 +31,6 @@ public class Controller {
     @FXML
     public BorderPane root;
     @FXML
-    public ProgressBar progressBar;
-    @FXML
     public RadioButton juliaRB, mandelbrotRB;
     @FXML
     public RadioButton c1RB, c2RB, c3RB, c4RB, cCustomRB;
@@ -48,13 +42,14 @@ public class Controller {
     public Slider colorSlider;
     @FXML
     public Label colorLabel;
+    @FXML
+    public Label progressLabel;
 
     Settings settings = Settings.getInstance();
     private double zoom;
 
     @FXML
     public void initialize() {
-        progressBar.setProgress(0);
         ObjectProperty<Point2D> mouseDown = new SimpleObjectProperty<>();
         fractalView.setViewport(new Rectangle2D(0, 0, settings.IMG_WIDTH, settings.IMG_HEIGHT));
         fractalView.setOnMousePressed(e -> {
@@ -93,7 +88,7 @@ public class Controller {
     // event handler for the "Generate" button
     @FXML
     private void onGenButtonClicked () {
-        progressBar.setVisible(true);
+        progressLabel.setVisible(true);
         generate();
     } // end of onGenButtonClicked()
 
@@ -166,44 +161,18 @@ public class Controller {
             fractal = new Julia(settings.MAX_ITERATIONS, c);
         }
 
-        // create a new service object
-        Service<Void> myService = createService(wi, fractal, 0, 0, maxRow, maxCol);
-        // bind the progress bar's progressProperty to the service's progress property
-        progressBar.progressProperty().bind(myService.progressProperty());
+        // create a new ThreadManager object
+        ThreadManager myService = new ThreadManager(wi, fractal);
+
         // if the service has succeeded, update the image view
         myService.setOnSucceeded(e -> {
             fractalView.setImage(wi);
-            progressBar.setVisible(false);
+            progressLabel.setVisible(false);
         });
 
         // start the service
         myService.start();
     } // end of generate()
-
-    private Service<Void> createService(WritableImage image, Fractal fractal, int minRow, int minCol, int maxRow, int maxCol) {
-        return new Service<Void>() {
-            @Override
-            protected Task<Void> createTask() {
-                return new Task<Void>() {
-                    @Override
-                    protected Void call() {
-                        double deltaX = (fractal.getMaxX() - fractal.getMinX()) / ((int) image.getWidth());
-                        double deltaY = (fractal.getMaxY() - fractal.getMinY()) / ((int) image.getHeight());
-                        for(int col = minCol; col <= maxCol; col++) {
-                            for (int row = minRow; row <= maxRow; row++) {
-                                double i = fractal.calculate(fractal.getMinX() + col * deltaX, fractal.getMaxY() - row * deltaY);
-                                double hue = settings.colorOffset + 360*(i/(double) settings.MAX_ITERATIONS);
-                                double brightness = ((int) i == settings.MAX_ITERATIONS) ? 0 : 1;
-                                image.getPixelWriter().setColor(col, row, Color.hsb(hue, 1.0, brightness));
-                            }
-                            updateProgress(col - minCol, maxCol - minCol);
-                        }
-                        return null;
-                    }
-                };
-            }
-        };
-    } // end of createService()
 
     // helper methods for scrolling and zooming the image view
     private double sanityCheck(double value, double min, double max) {
