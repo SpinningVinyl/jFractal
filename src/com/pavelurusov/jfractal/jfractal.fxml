@@ -26,8 +26,8 @@
                 <Button text="Save PNG" onMouseClicked="#onSaveButtonClicked" />
             </HBox>
             <Label text="Set: " style="-fx-padding: 20px 0 0 0" />
-            <RadioButton fx:id="mandelbrotRB" text = "Mandelbrot" toggleGroup="$fractal" onAction="#selectSet" />
-            <RadioButton fx:id="juliaRB" text = "Julia" selected="true" onAction="#selectSet" toggleGroup="$fractal" />
+            <RadioButton fx:id="mandelbrotRB" text = "Mandelbrot" toggleGroup="$fractal" />
+            <RadioButton fx:id="juliaRB" text = "Julia" selected="true" toggleGroup="$fractal" />
 
             <Label text="C (for Julia set): " style="-fx-padding: 30px 0 0 0" />
             <RadioButton fx:id="c1RB" text = "c = 0.285 + 0.01i" selected="true" toggleGroup="$c" />

@@ -19,6 +19,22 @@ public class ThreadManager extends Service<Void> {
         this.fractal = fractal;
     }
 
+    public ThreadManager() {
+
+    }
+
+    public void setImage(WritableImage image) {
+        this.image = image;
+    }
+
+    public void setFractal(Fractal fractal) {
+        this.fractal = fractal;
+    }
+
+    public WritableImage getImage() {
+        return image;
+    }
+
     @Override
     protected Task<Void> createTask() {
         return new Task<Void>() {

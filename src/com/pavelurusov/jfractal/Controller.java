@@ -3,6 +3,7 @@ package com.pavelurusov.jfractal;
 import com.pavelurusov.complex.Complex;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Worker;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
@@ -45,11 +46,31 @@ public class Controller {
     @FXML
     public Label progressLabel;
 
+    private ThreadManager fractalGenerator;
+
     Settings settings = Settings.getInstance();
     private double zoom;
 
     @FXML
     public void initialize() {
+        // create a new service
+        fractalGenerator = new ThreadManager();
+        // progressLabel should be visible only while the service is running
+        progressLabel.visibleProperty().bind(fractalGenerator.runningProperty());
+        // colorSlider should be disabled while the service is running
+        colorSlider.disableProperty().bind(fractalGenerator.runningProperty());
+        // if the service succeeded, display the generated image
+        fractalGenerator.setOnSucceeded(e -> fractalView.setImage(fractalGenerator.getImage()));
+
+        // UI for setting Julia set parameters should be disabled when Mandelbrot is selected
+        c1RB.disableProperty().bind(mandelbrotRB.selectedProperty());
+        c2RB.disableProperty().bind(mandelbrotRB.selectedProperty());
+        c3RB.disableProperty().bind(mandelbrotRB.selectedProperty());
+        c4RB.disableProperty().bind(mandelbrotRB.selectedProperty());
+        cCustomRB.disableProperty().bind(mandelbrotRB.selectedProperty());
+        aSlider.disableProperty().bind(mandelbrotRB.selectedProperty());
+
+        // event handlers for scrolling the image by clicking + dragging
         ObjectProperty<Point2D> mouseDown = new SimpleObjectProperty<>();
         fractalView.setViewport(new Rectangle2D(0, 0, settings.IMG_WIDTH, settings.IMG_HEIGHT));
         fractalView.setOnMousePressed(e -> {
@@ -61,11 +82,8 @@ public class Controller {
             move(fractalView, currentPoint.subtract(mouseDown.get()));
             mouseDown.set(translateCoords(fractalView, new Point2D(e.getX(), e.getY())));
         });
-        aSlider.valueProperty().addListener((obs, oldValue, newValue) -> aLabel.setText(String.format("%.4f",newValue.doubleValue()) + "π"));
-        colorSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
-            settings.colorOffset = newValue.intValue();
-            colorLabel.setText(String.valueOf(settings.colorOffset));
-        });
+
+        // event handlers for zooming the image
         zoomSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
             zoom = newValue.doubleValue();
             zoomLabel.setText(String.format("%.2f",zoom));
@@ -83,12 +101,19 @@ public class Controller {
                 zoomSlider.setValue(1);
             }
         });
+
+        // setting stuff when the values of the sliders are changed
+        aSlider.valueProperty().addListener((obs, oldValue, newValue) -> aLabel.setText(String.format("%.4f",newValue.doubleValue()) + "π"));
+        colorSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
+            settings.colorOffset = newValue.intValue();
+            colorLabel.setText(String.valueOf(settings.colorOffset));
+        });
+
     } // end of initialize()
 
     // event handler for the "Generate" button
     @FXML
     private void onGenButtonClicked () {
-        progressLabel.setVisible(true);
         generate();
     } // end of onGenButtonClicked()
 
@@ -114,21 +139,6 @@ public class Controller {
             }
         }
     } // end of onSaveButtonClicked()
-
-    // event handler for the set radio buttons
-    @FXML
-    private void selectSet() {
-        boolean juliaParamsDisable = false;
-        if(!juliaRB.isSelected()) {
-            juliaParamsDisable = true;
-        }
-        c1RB.setDisable(juliaParamsDisable);
-        c2RB.setDisable(juliaParamsDisable);
-        c3RB.setDisable(juliaParamsDisable);
-        c4RB.setDisable(juliaParamsDisable);
-        cCustomRB.setDisable(juliaParamsDisable);
-        aSlider.setDisable(juliaParamsDisable);
-    } // end of selectSet()
 
     private void generate() {
         // create a new Writable Image
@@ -159,17 +169,17 @@ public class Controller {
             fractal = new Julia(settings.MAX_ITERATIONS, c);
         }
 
-        // create a new ThreadManager object
-        ThreadManager myService = new ThreadManager(wi, fractal);
+        // if the service is not ready, reset it
+        if (fractalGenerator.getState() != Worker.State.READY) {
+            fractalGenerator.reset();
+        }
 
-        // if the service has succeeded, update the image view
-        myService.setOnSucceeded(e -> {
-            fractalView.setImage(wi);
-            progressLabel.setVisible(false);
-        });
+        // pass the fractal and the image to the service
+        fractalGenerator.setFractal(fractal);
+        fractalGenerator.setImage(wi);
 
         // start the service
-        myService.start();
+        fractalGenerator.start();
     } // end of generate()
 
     // helper methods for scrolling and zooming the image view
